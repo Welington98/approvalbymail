@@ -67,7 +67,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
         return true;
     }
 
-    private static function showConfigForm(): void
+    public static function showConfigForm(): void
     {
         /** @var DBmysql $DB */
         global $DB;

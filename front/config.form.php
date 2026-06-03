@@ -9,7 +9,6 @@ if (!$plugin->isActivated('approvalbymail')) {
     return;
 }
 
-// Só quem pode configurar o GLPI mexe nos flags.
 Session::checkRight('config', UPDATE);
 
 if (isset($_POST['update_config'])) {
@@ -31,5 +30,6 @@ if (isset($_POST['update_config'])) {
     Session::addMessageAfterRedirect(__('Configuration updated', 'approvalbymail'), true, INFO);
 }
 
-Html::back();
+// Sempre retorna para a pagina de configuracao (evita ERR_TOO_MANY_REDIRECTS).
+Html::redirect(Plugin::getWebDir('approvalbymail') . '/front/config.php');
 

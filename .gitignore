@@ -3,3 +3,5 @@
 *.log
 .DS_Store
 
+/bootstrap_approvalbymail.sh
+/patch_*.sh

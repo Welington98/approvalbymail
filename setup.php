@@ -30,7 +30,7 @@ function plugin_init_approvalbymail(): void
     ]);
 
     // Link de engrenagem na lista de plugins.
-    $PLUGIN_HOOKS['config_page']['approvalbymail'] = 'front/config.form.php';
+    $PLUGIN_HOOKS['config_page']['approvalbymail'] = 'front/config.php';
 
     // S1+: aqui entram os hooks 'item_add' (TicketValidation) e afins.
 }
@@ -43,7 +43,7 @@ function plugin_version_approvalbymail(): array
     return [
         'name'           => 'Approval by Mail',
         'version'        => PLUGIN_APPROVALBYMAIL_VERSION,
-        'author'         => '<seu nome / Verdanadesk>',
+        'author'         => 'Carlos Alberto Correa Filho - IPT.br',
         'license'        => 'GPLv3',
         'homepage'       => '',
         'requirements'   => [
