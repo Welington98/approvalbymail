@@ -1,0 +1,13 @@
+/* approval by mail — estilos da pagina publica de acao.
+   Padrao SDB-14: unidades relativas, sem vw para fonte, sem !important em cascata. */
+:root {
+  --abm-max-width: 42rem;
+}
+.abm-container {
+  max-width: var(--abm-max-width);
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+

@@ -1,0 +1,17 @@
+{
+  "name": "approvalbymail",
+  "version": "0.0.1-alpha",
+  "private": true,
+  "description": "GLPI plugin — approval by mail (Padrao SDB)",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "build": "bash tools/build_assets.sh"
+  },
+  "devDependencies": {
+    "cssnano": "^7.0.0",
+    "postcss": "^8.4.0",
+    "postcss-cli": "^11.0.0",
+    "terser": "^5.31.0"
+  }
+}
+
