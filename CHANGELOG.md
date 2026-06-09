@@ -1,21 +1,27 @@
-# Changelog
-
-Formato: [Keep a Changelog](https://keepachangelog.com/) · Versionamento: SemVer.
-
-## [0.0.1-alpha] - 2026-06-03
-### Added
-- Scaffold inicial do plugin (Padrao SDB).
-- Instalacao/desinstalacao limpa: tabelas `config` e `actions` (com `used_at`).
-- Feature flag para aprovacao de TicketValidation.
-- Aba de configuracao em "Configurar > Geral".
-- Cripto via GLPIKey (chave gerenciada pelo GLPI).
-- Pipeline de build (minificacao CSS/JS) e i18n (pt_BR, en_US).
-- (S0) Scaffold, tabelas config/actions, feature flag, página de config, cripto GLPIKey.
-- (S1) Núcleo do token (random_bytes/hash_equals/used_at/TTL) e hook item_add do TicketValidation.
-### Security
-- Token de uso único com expiração; validação server-side via resolve().
-- Deploy endurecido: guarda de caminho no rsync --delete.
 # Changelog — approval by mail
+
+Todas as mudanças relevantes deste plugin. Formato baseado em
+[Keep a Changelog](https://keepachangelog.com/), versionamento [SemVer](https://semver.org/).
+
+## [0.1.0-rc] - 2026-06-09
+
+Primeiro release candidate: ciclo de validação completo e fechado nos dois sentidos.
+
+### Added
+- **Notificação ao solicitante:** ao aplicar a decisão, dispara a notificação nativa
+  `validation_answer`, avisando quem pediu a validação (fecha o ciclo de comunicação).
+
+### Changed
+- Versão de `0.0.1-alpha` para `0.1.0-rc`.
+
+### Tested
+- Caminhos de **Aprovar** (status ACCEPTED) e **Reprovar** (status REFUSED) validados
+  ponta a ponta em homologação, incluindo single-use do token e recálculo do
+  `global_validation` do chamado.
+
+### Deferred (pré-1.0)
+- i18n (PT/EN) dos textos da página e do template.
+- `comment_validation` via `Sanitizer`.
 
 ## [0.0.1-alpha] - 2026-06-09
 

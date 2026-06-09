@@ -250,6 +250,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         )
     );
 
+    // Fecha o ciclo: notifica o solicitante via notificação nativa "validation_answer".
+    $ticket_notif = new Ticket();
+    if ($ticket_notif->getFromDB($tickets_id)) {
+        NotificationEvent::raiseEvent('validation_answer', $ticket_notif, ['validation_id' => $tv_id]);
+        Toolbox::logInFile(
+            'approvalbymail',
+            sprintf("op=notify_answer validation_id=%d result=queued\n", $tv_id)
+        );
+    }
+
     $label = $decision === 'approve' ? 'aprovado' : 'reprovado';
     abm_html_page(
         'Concluído',
