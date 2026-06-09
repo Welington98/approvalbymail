@@ -5,7 +5,7 @@
  */
 
 /**
- * Instalação: cria tabelas e popula o feature flag.
+ * Instalação: cria tabelas, popula o feature flag e registra os modelos de notificação.
  */
 function plugin_approvalbymail_install(): bool
 {
@@ -58,19 +58,26 @@ function plugin_approvalbymail_install(): bool
         );
     }
 
-    // S2: instalação dos modelos de notificação entra aqui.
+    // --- Modelos de notificação (S2) ---
+    if (!PluginApprovalbymailNotification::installNotificationModels()) {
+        return false;
+    }
 
     return true;
 }
 
 /**
- * Desinstalação: remove tabelas (teardown completo).
+ * Desinstalação: remove modelos de notificação e tabelas (teardown completo).
  */
 function plugin_approvalbymail_uninstall(): bool
 {
     /** @var DBmysql $DB */
     global $DB;
 
+    // --- Modelos de notificação (S2): remover antes das tabelas ---
+    PluginApprovalbymailNotification::uninstallNotificationModels();
+
+    // --- Tabelas do plugin ---
     foreach ([
         PluginApprovalbymailAction::getTable(),
         PluginApprovalbymailConfig::getTable(),
@@ -80,8 +87,5 @@ function plugin_approvalbymail_uninstall(): bool
         }
     }
 
-    // S2: remoção dos modelos de notificação entra aqui.
-
     return true;
 }
-

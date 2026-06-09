@@ -29,6 +29,11 @@ function plugin_init_approvalbymail(): void
         'addtabon' => Config::class,
     ]);
 
+    // A ação tokenizada suporta modelos de notificação (S2).
+    Plugin::registerClass(PluginApprovalbymailAction::class, [
+        'notificationtemplates_types' => true,
+    ]);
+
     // Link de engrenagem na lista de plugins.
     $PLUGIN_HOOKS['config_page']['approvalbymail'] = 'front/config.php';
 
@@ -73,4 +78,3 @@ function plugin_approvalbymail_check_config($verbose = false): bool
 {
     return true;
 }
-

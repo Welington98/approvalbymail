@@ -12,6 +12,17 @@ if [ ! -f "$GLPI_ROOT/bin/console" ]; then
   echo "AVISO: não achei $GLPI_ROOT/bin/console — confira GLPI_ROOT em deploy/config.sh." >&2
 fi
 
+# Guarda de segurança: o rsync --delete só pode mirar .../plugins/<chave>.
+# Evita que um GLPI_ROOT/PLUGIN_DIR mal configurado apague algo fora do plugin.
+case "$PLUGIN_DIR" in
+  */plugins/"$PLUGIN_KEY") : ;;
+  *)
+    echo "ERRO: PLUGIN_DIR fora de .../plugins/$PLUGIN_KEY — abortando para não apagar nada indevido." >&2
+    echo "      PLUGIN_DIR atual: $PLUGIN_DIR" >&2
+    exit 1
+    ;;
+esac
+
 echo "==> Implantando em: $PLUGIN_DIR"
 sudo mkdir -p "$PLUGIN_DIR"
 
@@ -28,4 +39,3 @@ sudo -u "$WEB_USER" php "$GLPI_ROOT/bin/console" cache:clear || \
   echo "    (cache:clear falhou — verifique manualmente)"
 
 echo "==> Deploy concluído em $PLUGIN_DIR"
-

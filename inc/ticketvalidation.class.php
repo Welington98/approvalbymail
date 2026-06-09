@@ -5,8 +5,8 @@ if (!defined('GLPI_ROOT')) {
 
 /**
  * Gatilho de criação de pedido de validação de chamado.
- * Quando um TicketValidation é criado, gera a ação tokenizada que será
- * enviada por e-mail ao validador (o link de aprovar/recusar).
+ * Quando um TicketValidation é criado, gera a ação tokenizada e dispara
+ * a notificação por e-mail ao validador (o link de aprovar/recusar).
  */
 class PluginApprovalbymailTicketValidation extends CommonDBTM
 {
@@ -27,7 +27,6 @@ class PluginApprovalbymailTicketValidation extends CommonDBTM
         // O destinatário da ação é o validador designado.
         $users_id_validate = (int) ($item->fields['users_id_validate'] ?? 0);
         $validation_id     = (int) ($item->fields['id'] ?? 0);
-
         if ($users_id_validate <= 0 || $validation_id <= 0) {
             return;
         }
@@ -37,28 +36,54 @@ class PluginApprovalbymailTicketValidation extends CommonDBTM
             TicketValidation::class,
             $validation_id
         );
-
         if ($action === null) {
             Toolbox::logInFile(
                 'approvalbymail',
-                "Falha ao criar acao para TicketValidation #{$validation_id}\n"
+                sprintf(
+                    "op=item_add itemtype=TicketValidation validation_id=%d result=fail_createaction\n",
+                    $validation_id
+                )
             );
             return;
         }
 
-        // Token NÃO é registrado em log (é segredo). Só o rastro mínimo.
+        // Entidade do chamado, para o roteamento da notificação.
+        // (A Action não é entity-assigned; setamos em memória só para o raiseEvent.)
+        $entities_id = 0;
+        $tickets_id  = (int) ($item->fields['tickets_id'] ?? 0);
+        if ($tickets_id > 0) {
+            $ticket = new Ticket();
+            if ($ticket->getFromDB($tickets_id)) {
+                $entities_id = (int) $ticket->fields['entities_id'];
+            }
+        }
+        $action->fields['entities_id'] = $entities_id;
+
+        // Token NÃO é registrado em log (é segredo). Só o rastro mínimo (SDB-17).
         Toolbox::logInFile(
             'approvalbymail',
             sprintf(
-                "Acao #%d criada para TicketValidation #%d (validador %d)\n",
-                (int) $action->fields['id'],
+                "op=item_add itemtype=TicketValidation validation_id=%d action_id=%d users_id=%d entity=%d result=ok\n",
                 $validation_id,
-                $users_id_validate
+                (int) $action->fields['id'],
+                $users_id_validate,
+                $entities_id
             )
         );
 
-        // S2: aqui o Hash cifrado ($action->getEncryptedHash()) alimentará
-        //     o link do e-mail de notificação ao validador.
+        // Dispara a notificação: enfileira o e-mail ao validador com o link tokenizado.
+        NotificationEvent::raiseEvent(
+            PluginApprovalbymailNotificationTargetAction::EVENT_APPROVAL_REQUEST,
+            $action
+        );
+
+        Toolbox::logInFile(
+            'approvalbymail',
+            sprintf(
+                "op=raiseEvent event=approvalrequest action_id=%d entity=%d result=queued\n",
+                (int) $action->fields['id'],
+                $entities_id
+            )
+        );
     }
 }
-
