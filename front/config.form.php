@@ -14,7 +14,7 @@ Session::checkRight('config', UPDATE);
 if (isset($_POST['update_config'])) {
     $config = new PluginApprovalbymailConfig();
 
-    foreach ([PluginApprovalbymailConfig::TICKET_VALIDATION] as $id) {
+    foreach ([PluginApprovalbymailConfig::TICKET_VALIDATION, PluginApprovalbymailConfig::TICKET_SOLUTION, PluginApprovalbymailConfig::FOLLOWUP_PRIVATE] as $id) {
         if ($config->getFromDB($id)) {
             $new = isset($_POST['is_active_' . $id]) ? (int) $_POST['is_active_' . $id] : 0;
             if ((int) $config->fields['is_active'] !== $new) {
