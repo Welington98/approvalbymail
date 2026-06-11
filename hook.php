@@ -4,9 +4,6 @@
  * Padrão SDB: simétrico, idempotente, sem SQL com input concatenado.
  */
 
-/**
- * Instalação: cria tabelas, popula o feature flag e registra os modelos de notificação.
- */
 function plugin_approvalbymail_install(): bool
 {
     /** @var DBmysql $DB */
@@ -28,11 +25,25 @@ function plugin_approvalbymail_install(): bool
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
 
-        // Seed: somente a aprovação de TicketValidation no alpha.
+        // Seeds: validação (ON), solução (OFF — opt-in), followup privado (ON).
         $DB->insert($config_table, [
             'id'        => PluginApprovalbymailConfig::TICKET_VALIDATION,
-            'name'      => 'Ticket - Aprovação',
+            'name'      => 'Ticket - Aprovação de Validação',
             'content'   => 'Envia e-mail para aprovar/recusar a validação de chamado',
+            'is_active' => 1,
+            'date_mod'  => $now,
+        ]);
+        $DB->insert($config_table, [
+            'id'        => PluginApprovalbymailConfig::TICKET_SOLUTION,
+            'name'      => 'Ticket - Aprovação de Solução',
+            'content'   => 'Envia e-mail para o requerente aprovar/recusar a solução do chamado',
+            'is_active' => 0,
+            'date_mod'  => $now,
+        ]);
+        $DB->insert($config_table, [
+            'id'        => PluginApprovalbymailConfig::FOLLOWUP_PRIVATE,
+            'name'      => 'Acompanhamento de auditoria — privado',
+            'content'   => 'Sim = acompanhamento privado (só técnicos); Não = público',
             'is_active' => 1,
             'date_mod'  => $now,
         ]);
@@ -66,18 +77,13 @@ function plugin_approvalbymail_install(): bool
     return true;
 }
 
-/**
- * Desinstalação: remove modelos de notificação e tabelas (teardown completo).
- */
 function plugin_approvalbymail_uninstall(): bool
 {
     /** @var DBmysql $DB */
     global $DB;
 
-    // --- Modelos de notificação (S2): remover antes das tabelas ---
     PluginApprovalbymailNotification::uninstallNotificationModels();
 
-    // --- Tabelas do plugin ---
     foreach ([
         PluginApprovalbymailAction::getTable(),
         PluginApprovalbymailConfig::getTable(),

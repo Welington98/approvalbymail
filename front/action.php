@@ -250,6 +250,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         )
     );
 
+    // Transparência (item 2): acompanhamento de auditoria atribuído ao decisor
+    // (quem/como/quando/de onde). Privado/público conforme o flag FOLLOWUP_PRIVATE.
+    PluginApprovalbymailAudit::recordDecision(
+        $tickets_id,
+        (int) ($action->fields['users_id'] ?? 0),
+        'Validação',
+        $decision,
+        (string) ($_SERVER['REMOTE_ADDR'] ?? '')
+    );
+
     // Fecha o ciclo: notifica o solicitante via notificação nativa "validation_answer".
     $ticket_notif = new Ticket();
     if ($ticket_notif->getFromDB($tickets_id)) {

@@ -10,7 +10,9 @@ class PluginApprovalbymailConfig extends CommonDBTM
 {
     /** Feature flags (IDs fixos na tabela de config). */
     public const TICKET_VALIDATION = 1;
-    // S2+/fases seguintes: CHANGE_VALIDATION, TICKET_SOLUTION, etc.
+    public const TICKET_SOLUTION   = 2;
+    public const FOLLOWUP_PRIVATE  = 3; // is_active=1 => acompanhamento de auditoria privado
+    // Fases seguintes: CHANGE_VALIDATION, etc.
 
     public $dohistory = false;
 
@@ -46,6 +48,21 @@ class PluginApprovalbymailConfig extends CommonDBTM
 
     static function canPurge()
     {
+        return false;
+    }
+
+    /**
+     * Um feature flag está ativo? (lê is_active da linha pelo id).
+     * Reutilizável: portão de cada tipo de aprovação e da privacidade do followup.
+     */
+    public static function isActive(int $id): bool
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        foreach ($DB->request(['FROM' => self::getTable(), 'WHERE' => ['id' => $id]]) as $row) {
+            return ((int) $row['is_active']) === 1;
+        }
         return false;
     }
 
@@ -105,25 +122,17 @@ class PluginApprovalbymailConfig extends CommonDBTM
 
     // ---- Cripto (Padrão SDB-1): chave gerenciada pelo GLPI ----
 
-    /**
-     * Cifra um texto usando a chave do GLPI (GLPIKey).
-     */
     public static function encrypt(string $plaintext): string
     {
         return (new GLPIKey())->encrypt($plaintext);
     }
 
-    /**
-     * Decifra um texto; retorna null em caso de falha (token adulterado/ inválido).
-     */
     public static function decrypt(string $ciphertext): ?string
     {
         try {
-            // '+' vira espaço ao passar por URL — desfaz antes de decifrar.
             return (new GLPIKey())->decrypt(str_replace(' ', '+', $ciphertext));
         } catch (\Throwable $e) {
             return null;
         }
     }
 }
-
