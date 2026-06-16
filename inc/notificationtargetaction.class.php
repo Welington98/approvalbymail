@@ -4,30 +4,36 @@ if (!defined('GLPI_ROOT')) {
 }
 
 /**
- * Alvo e dados da notificação "approvalrequest".
+ * Alvo e dados das notificações por e-mail do plugin.
  *
  * Itemtype-alvo: PluginApprovalbymailAction (a ação tokenizada).
- * Destinatário : o validador (campo `users_id` da própria ação).
+ * Dois eventos:
+ *   - approvalrequest  (validação) -> destinatário = validador  (users_id da ação)
+ *   - solutionapproval (solução)   -> destinatário = requerente (users_id da ação)
  *
- * Padrão SDB-5 (roteia pela stack nativa) + SDB-17 (log chave=valor).
+ * Em ambos, o destinatário é o `users_id` da própria ação; muda só o rótulo
+ * do alvo e o texto do modelo. Padrão SDB-5 + SDB-17.
  */
 class PluginApprovalbymailNotificationTargetAction extends NotificationTarget
 {
-    /** Evento próprio do plugin. */
-    public const EVENT_APPROVAL_REQUEST = 'approvalrequest';
+    /** Eventos próprios do plugin. */
+    public const EVENT_APPROVAL_REQUEST  = 'approvalrequest';
+    public const EVENT_SOLUTION_APPROVAL = 'solutionapproval';
 
-    /** Alvo customizado: o validador da ação. Id alto para não colidir com alvos do core. */
-    public const TARGET_VALIDATOR = 9001;
+    /** Alvos customizados (id alto para não colidir com alvos do core). */
+    public const TARGET_VALIDATOR = 9001; // validação -> validador
+    public const TARGET_REQUESTER = 9002; // solução   -> requerente
 
     public function getEvents()
     {
         return [
-            self::EVENT_APPROVAL_REQUEST => __('Approval request by mail', 'approvalbymail'),
+            self::EVENT_APPROVAL_REQUEST  => __('Approval request by mail', 'approvalbymail'),
+            self::EVENT_SOLUTION_APPROVAL => __('Solution approval request by mail', 'approvalbymail'),
         ];
     }
 
     /**
-     * Declara o alvo customizado (aparece na config da notificação).
+     * Declara os alvos customizados (aparecem na config da notificação).
      */
     public function addAdditionalTargets($event = '')
     {
@@ -36,25 +42,31 @@ class PluginApprovalbymailNotificationTargetAction extends NotificationTarget
             __('Validator of the action', 'approvalbymail'),
             Notification::USER_TYPE
         );
+        $this->addTarget(
+            self::TARGET_REQUESTER,
+            __('Requester of the action', 'approvalbymail'),
+            Notification::USER_TYPE
+        );
     }
 
     /**
-     * Resolve o alvo customizado em destinatário real.
-     * $this->obj é a Action; users_id = validador.
+     * Resolve os alvos customizados em destinatário real.
+     * Em ambos os casos o destinatário é o `users_id` da ação
+     * (validador na validação; requerente na solução).
      */
     public function addSpecificTargets($data, $options)
     {
         if (
             (int) $data['type'] === Notification::USER_TYPE
-            && (int) $data['items_id'] === self::TARGET_VALIDATOR
+            && in_array((int) $data['items_id'], [self::TARGET_VALIDATOR, self::TARGET_REQUESTER], true)
         ) {
-            // Helper do core: busca o usuário pelo campo no objeto do evento e valida deleted/active.
             $this->addUserByField('users_id');
         }
     }
 
     /**
-     * Monta os tags do template, incluindo o link tokenizado.
+     * Monta os tags do template, incluindo o link tokenizado e o título do chamado.
+     * O título é resolvido conforme o itemtype da ação (validação OU solução).
      */
     public function addDataForTemplate($event, $options = [])
     {
@@ -66,28 +78,41 @@ class PluginApprovalbymailNotificationTargetAction extends NotificationTarget
         $base   = rtrim((string) ($CFG_GLPI['url_base'] ?? ''), '/');
         $url    = $base . '/plugins/approvalbymail/front/action.php?hash=' . rawurlencode($hash);
 
-        // Título do chamado (melhor esforço, sem quebrar se algo faltar).
-        $title = '';
-        if (($action->fields['itemtype'] ?? '') === 'TicketValidation') {
+        // Resolve o chamado conforme o objeto da ação.
+        $itemtype   = (string) ($action->fields['itemtype'] ?? '');
+        $items_id   = (int) ($action->fields['items_id'] ?? 0);
+        $tickets_id = 0;
+
+        if ($itemtype === 'TicketValidation') {
             $tv = new TicketValidation();
-            if ($tv->getFromDB((int) ($action->fields['items_id'] ?? 0))) {
-                $tkt = new Ticket();
-                if ($tkt->getFromDB((int) ($tv->fields['tickets_id'] ?? 0))) {
-                    $title = (string) ($tkt->fields['name'] ?? '');
-                }
+            if ($tv->getFromDB($items_id)) {
+                $tickets_id = (int) ($tv->fields['tickets_id'] ?? 0);
+            }
+        } elseif ($itemtype === 'ITILSolution') {
+            $sol = new ITILSolution();
+            if ($sol->getFromDB($items_id) && ($sol->fields['itemtype'] ?? '') === 'Ticket') {
+                $tickets_id = (int) ($sol->fields['items_id'] ?? 0);
+            }
+        }
+
+        $title = '';
+        if ($tickets_id > 0) {
+            $tkt = new Ticket();
+            if ($tkt->getFromDB($tickets_id)) {
+                $title = (string) ($tkt->fields['name'] ?? '');
             }
         }
 
         $this->data['##approvalbymail.url##']         = $url;
         $this->data['##approvalbymail.tickettitle##'] = $title;
 
-        // SDB-17: log estruturado chave=valor (código+string onde houver, valores explícitos).
         Toolbox::logInFile(
             'approvalbymail',
             sprintf(
-                "op=addDataForTemplate action_id=%d users_id=%d url_len=%d title_set=%d result=ok\n",
+                "op=addDataForTemplate event=%s action_id=%d itemtype=%s url_len=%d title_set=%d result=ok\n",
+                $event,
                 (int) ($action->fields['id'] ?? 0),
-                (int) ($action->fields['users_id'] ?? 0),
+                $itemtype !== '' ? $itemtype : '-',
                 strlen($url),
                 $title !== '' ? 1 : 0
             )
