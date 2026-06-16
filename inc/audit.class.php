@@ -46,7 +46,7 @@ class PluginApprovalbymailAudit extends CommonDBTM
             }
         }
 
-        $is_private = PluginApprovalbymailConfig::isActive(
+        $is_private = PluginApprovalbymailConfig::isFeatureActive(
             PluginApprovalbymailConfig::FOLLOWUP_PRIVATE
         ) ? 1 : 0;
 

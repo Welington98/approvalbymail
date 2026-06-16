@@ -37,9 +37,12 @@ function plugin_init_approvalbymail(): void
     // Link de engrenagem na lista de plugins.
     $PLUGIN_HOOKS['config_page']['approvalbymail'] = 'front/config.php';
 
-    // S1: ao criar um pedido de validação de chamado, gera a ação tokenizada.
+    // Gatilhos de criação:
+    //  - S1: pedido de validação de chamado  -> notifica o validador
+    //  - S3: solução de chamado (WAITING)     -> notifica o requerente
     $PLUGIN_HOOKS['item_add']['approvalbymail'] = [
         TicketValidation::class => [PluginApprovalbymailTicketValidation::class, 'item_add'],
+        ITILSolution::class     => [PluginApprovalbymailItilSolution::class, 'item_add'],
     ];
 }
 

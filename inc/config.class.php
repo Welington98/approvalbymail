@@ -55,7 +55,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
      * Um feature flag está ativo? (lê is_active da linha pelo id).
      * Reutilizável: portão de cada tipo de aprovação e da privacidade do followup.
      */
-    public static function isActive(int $id): bool
+    public static function isFeatureActive(int $id): bool
     {
         /** @var DBmysql $DB */
         global $DB;
