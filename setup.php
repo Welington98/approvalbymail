@@ -4,7 +4,7 @@
  * Fork modernizado (Padrão SDB) do plugin "SDB - Ação por e-mail" (GPLv3).
  */
 
-define('PLUGIN_APPROVALBYMAIL_VERSION', '0.1.0-rc');
+define('PLUGIN_APPROVALBYMAIL_VERSION', '0.2.0-rc');
 define('PLUGIN_APPROVALBYMAIL_MIN_GLPI', '10.0.0');
 define('PLUGIN_APPROVALBYMAIL_MAX_GLPI', '10.0.99');
 
