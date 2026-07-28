@@ -1,4 +1,5 @@
 <?php
+
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access this file directly");
 }
@@ -21,32 +22,32 @@ class PluginApprovalbymailConfig extends CommonDBTM
         return 'glpi_plugin_approvalbymail_config';
     }
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
         return __('Approval by Mail', 'approvalbymail');
     }
 
-    static function canView(): bool
+    public static function canView(): bool
     {
         return Session::haveRight('config', READ);
     }
 
-    static function canCreate(): bool
+    public static function canCreate(): bool
     {
         return false;
     }
 
-    static function canUpdate(): bool
+    public static function canUpdate(): bool
     {
         return Session::haveRight('config', UPDATE);
     }
 
-    static function canDelete(): bool
+    public static function canDelete(): bool
     {
         return false;
     }
 
-    static function canPurge(): bool
+    public static function canPurge(): bool
     {
         return false;
     }
@@ -68,7 +69,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
 
     // ---- Aba dentro de Config (Configurar > Geral) ----
 
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (!$withtemplate && $item instanceof Config) {
             return self::getTypeName();
@@ -76,7 +77,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
         return '';
     }
 
-    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         if ($item instanceof Config) {
             self::showConfigForm();
@@ -117,7 +118,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
         // --- Logo URL ---
         $logo_row = current(iterator_to_array($DB->request([
             'FROM' => self::getTable(),
-            'WHERE' => ['id' => self::LOGO]
+            'WHERE' => ['id' => self::LOGO],
         ])));
         $logo_url = $logo_row ? (string) ($logo_row['content'] ?? '') : '';
         echo '<tr class="tab_bg_1">';

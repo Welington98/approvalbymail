@@ -1,4 +1,5 @@
 <?php
+
 include('../../../inc/includes.php');
 
 Session::checkLoginUser();
@@ -21,4 +22,3 @@ Html::header(
 PluginApprovalbymailConfig::showConfigForm();
 
 Html::footer();
-

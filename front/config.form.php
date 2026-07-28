@@ -1,4 +1,5 @@
 <?php
+
 include('../../../inc/includes.php');
 
 Session::checkLoginUser();
@@ -44,4 +45,3 @@ if (isset($_POST['update_config'])) {
 
 // Sempre retorna para a pagina de configuracao (evita ERR_TOO_MANY_REDIRECTS).
 Html::redirect(Plugin::getWebDir('approvalbymail') . '/front/config.php');
-

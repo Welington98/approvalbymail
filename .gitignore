@@ -1,7 +1,10 @@
 /node_modules/
+/vendor/
 /staging/
 *.log
 .DS_Store
+/.phpunit.cache/
+/.php-cs-fixer.cache/
 
 /bootstrap_approvalbymail.sh
 /patch_*.sh

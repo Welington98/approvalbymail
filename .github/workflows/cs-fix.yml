@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   cs-fix:
-    name: Verificar sintaxe PHP
+    name: Aplicar PHP-CS-Fixer
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -24,7 +24,22 @@ jobs:
           extensions: curl, json
           coverage: none
 
-      - name: Verificar sintaxe PHP
+      - name: Instalar dependências
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Aplicar correções de estilo
+        run: composer cs-fix
+        env:
+          PHP_CS_FIXER_IGNORE_ENV: '1'
+
+      - name: Commitar correções
         run: |
-          find . -name "*.php" -not -path "./vendor/*" -print0 \
-            | xargs -0 -n1 -P4 php -l
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nenhuma correção de estilo necessária."
+          else
+            git commit -m "style: aplicar padrões do PHP-CS-Fixer (PER-CS 2.0)"
+            git push
+          fi

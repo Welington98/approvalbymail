@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         cacheDirectory=".phpunit.cache">
+    <testsuites>
+        <testsuite name="Approval by Mail">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>inc</directory>
+            <directory>front</directory>
+            <directory>hook.php</directory>
+            <directory>setup.php</directory>
+        </include>
+    </source>
+</phpunit>

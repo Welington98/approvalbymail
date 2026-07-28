@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Página pública (sem login) de aprovação/reprovação por link tokenizado.
  *
@@ -27,36 +28,36 @@ function abm_html_page(string $title, string $bodyHtml): void
 {
     $t = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
     echo "<!DOCTYPE html>\n<html lang=\"pt-BR\"><head>";
-    echo "<meta charset=\"utf-8\">";
-    echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+    echo '<meta charset="utf-8">';
+    echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
     echo "<title>{$t}</title>";
-    echo "<style>"
-        . ":root{--abm-fg:#1f2933;--abm-muted:#616e7c;--abm-line:#e4e7eb;"
-        . "--abm-ok:#0b8457;--abm-no:#b42318;--abm-bg:#f7f8fa;}"
-        . "*{box-sizing:border-box;}"
-        . "body{margin:0;background:var(--abm-bg);color:var(--abm-fg);"
+    echo '<style>'
+        . ':root{--abm-fg:#1f2933;--abm-muted:#616e7c;--abm-line:#e4e7eb;'
+        . '--abm-ok:#0b8457;--abm-no:#b42318;--abm-bg:#f7f8fa;}'
+        . '*{box-sizing:border-box;}'
+        . 'body{margin:0;background:var(--abm-bg);color:var(--abm-fg);'
         . "font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5;}"
-        . ".abm-wrap{max-width:34rem;margin:3rem auto;padding:0 1rem;}"
-        . ".abm-card{background:#fff;border:1px solid var(--abm-line);border-radius:.75rem;"
-        . "padding:1.75rem;box-shadow:0 1px 3px rgba(0,0,0,.06);}"
-        . "h1{font-size:1.25rem;margin:0 0 1rem;}"
-        . ".abm-muted{color:var(--abm-muted);font-size:.95rem;}"
-        . ".abm-ticket{background:var(--abm-bg);border:1px solid var(--abm-line);"
-        . "border-radius:.5rem;padding:.75rem 1rem;margin:1rem 0;}"
-        . ".abm-submission{background:var(--abm-bg);border-left:3px solid #9aa5b1;"
-        . "padding:.6rem .9rem;border-radius:.4rem;margin:.25rem 0 .5rem;}"
-        . "label{display:block;font-weight:600;margin:1rem 0 .4rem;}"
-        . "textarea{width:100%;min-height:5rem;border:1px solid var(--abm-line);"
-        . "border-radius:.5rem;padding:.6rem;font:inherit;resize:vertical;}"
-        . ".abm-err{color:var(--abm-no);font-weight:600;margin:.5rem 0 0;}"
-        . ".abm-actions{display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap;}"
-        . "button{flex:1 1 8rem;border:0;border-radius:.5rem;padding:.7rem 1rem;"
-        . "font:inherit;font-weight:600;color:#fff;cursor:pointer;}"
-        . ".abm-approve{background:var(--abm-ok);}.abm-reject{background:var(--abm-no);}"
-        . "</style></head><body><div class=\"abm-wrap\"><div class=\"abm-card\">";
+        . '.abm-wrap{max-width:34rem;margin:3rem auto;padding:0 1rem;}'
+        . '.abm-card{background:#fff;border:1px solid var(--abm-line);border-radius:.75rem;'
+        . 'padding:1.75rem;box-shadow:0 1px 3px rgba(0,0,0,.06);}'
+        . 'h1{font-size:1.25rem;margin:0 0 1rem;}'
+        . '.abm-muted{color:var(--abm-muted);font-size:.95rem;}'
+        . '.abm-ticket{background:var(--abm-bg);border:1px solid var(--abm-line);'
+        . 'border-radius:.5rem;padding:.75rem 1rem;margin:1rem 0;}'
+        . '.abm-submission{background:var(--abm-bg);border-left:3px solid #9aa5b1;'
+        . 'padding:.6rem .9rem;border-radius:.4rem;margin:.25rem 0 .5rem;}'
+        . 'label{display:block;font-weight:600;margin:1rem 0 .4rem;}'
+        . 'textarea{width:100%;min-height:5rem;border:1px solid var(--abm-line);'
+        . 'border-radius:.5rem;padding:.6rem;font:inherit;resize:vertical;}'
+        . '.abm-err{color:var(--abm-no);font-weight:600;margin:.5rem 0 0;}'
+        . '.abm-actions{display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap;}'
+        . 'button{flex:1 1 8rem;border:0;border-radius:.5rem;padding:.7rem 1rem;'
+        . 'font:inherit;font-weight:600;color:#fff;cursor:pointer;}'
+        . '.abm-approve{background:var(--abm-ok);}.abm-reject{background:var(--abm-no);}'
+        . '</style></head><body><div class="abm-wrap"><div class="abm-card">';
     echo $bodyHtml;
-    echo "</div><p class=\"abm-muted\" style=\"text-align:center;margin-top:1rem\">"
-        . "GLPI &middot; approval by mail</p></div></body></html>";
+    echo '</div><p class="abm-muted" style="text-align:center;margin-top:1rem">'
+        . 'GLPI &middot; approval by mail</p></div></body></html>';
 }
 
 /** Mensagem de erro genérica (não revela expirado/usado/forjado). */
@@ -219,7 +220,12 @@ function abm_handle_validation(PluginApprovalbymailAction $action, string $hash)
 
         if ($decision === 'reject' && $comment === '') {
             abm_render_form(
-                $post_url, $csrf, $hash, $ticket_id, $ticket_title, $submission_html,
+                $post_url,
+                $csrf,
+                $hash,
+                $ticket_id,
+                $ticket_title,
+                $submission_html,
                 'Para reprovar, é obrigatório informar o motivo.'
             );
             return;
@@ -379,7 +385,12 @@ function abm_handle_solution(PluginApprovalbymailAction $action, string $hash): 
         // Recusar exige motivo (servidor, além do bloqueio no navegador).
         if ($decision === 'reject' && $comment === '') {
             abm_render_solution_form(
-                $post_url, $csrf, $hash, $ticket_id, $ticket_title, $solution_html,
+                $post_url,
+                $csrf,
+                $hash,
+                $ticket_id,
+                $ticket_title,
+                $solution_html,
                 'Para recusar a solução, é obrigatório informar o motivo.'
             );
             return;

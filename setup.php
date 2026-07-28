@@ -1,4 +1,5 @@
 <?php
+
 /**
  * approval by mail — ação por e-mail no GLPI.
  * Fork modernizado (Padrão SDB) do plugin "SDB - Ação por e-mail" (GPLv3).
