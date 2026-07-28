@@ -1,4 +1,5 @@
 <?php
+
 /**
  * migra_s3b_notif.php — recria os modelos de notificação do approvalbymail.
  *

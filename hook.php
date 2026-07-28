@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Instalação/desinstalação do plugin approval by mail.
  * Padrão SDB: simétrico, idempotente, sem SQL com input concatenado.

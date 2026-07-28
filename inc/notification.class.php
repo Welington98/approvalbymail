@@ -1,4 +1,5 @@
 <?php
+
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access this file directly");
 }
@@ -136,7 +137,10 @@ class PluginApprovalbymailNotification
 
         Toolbox::logInFile('approvalbymail', sprintf(
             "op=createModel event=%s tpl_id=%d notif_id=%d target=%d result=ok\n",
-            $event, $tpl_id, $notif_id, $target_id
+            $event,
+            $tpl_id,
+            $notif_id,
+            $target_id
         ));
         return true;
     }

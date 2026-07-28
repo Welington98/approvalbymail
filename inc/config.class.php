@@ -1,4 +1,5 @@
 <?php
+
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access this file directly");
 }
@@ -68,7 +69,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
 
     // ---- Aba dentro de Config (Configurar > Geral) ----
 
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (!$withtemplate && $item instanceof Config) {
             return self::getTypeName();
@@ -117,7 +118,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
         // --- Logo URL ---
         $logo_row = current(iterator_to_array($DB->request([
             'FROM' => self::getTable(),
-            'WHERE' => ['id' => self::LOGO]
+            'WHERE' => ['id' => self::LOGO],
         ])));
         $logo_url = $logo_row ? (string) ($logo_row['content'] ?? '') : '';
         echo '<tr class="tab_bg_1">';
