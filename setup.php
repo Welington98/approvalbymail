@@ -4,9 +4,9 @@
  * Fork modernizado (Padrão SDB) do plugin "SDB - Ação por e-mail" (GPLv3).
  */
 
-define('PLUGIN_APPROVALBYMAIL_VERSION', '0.2.0-rc');
-define('PLUGIN_APPROVALBYMAIL_MIN_GLPI', '10.0.0');
-define('PLUGIN_APPROVALBYMAIL_MAX_GLPI', '10.0.99');
+define('PLUGIN_APPROVALBYMAIL_VERSION', '0.3.0-dev');
+define('PLUGIN_APPROVALBYMAIL_MIN_GLPI', '11.0.0');
+define('PLUGIN_APPROVALBYMAIL_MAX_GLPI', '11.0.99');
 
 /**
  * Inicialização do plugin (chamada em todo carregamento do GLPI).
@@ -23,6 +23,13 @@ function plugin_init_approvalbymail(): void
     if (!$plugin->isInstalled('approvalbymail') || !$plugin->isActivated('approvalbymail')) {
         return;
     }
+
+    // Página pública de aprovação: não exige sessão.
+    // (GLPI 11 firewall: sem isso, o Symfony redireciona para login.)
+    \Glpi\Http\SessionManager::registerPluginStatelessPath(
+        'approvalbymail',
+        '~^/front/approve\.php~'
+    );
 
     // Aba de configuração dentro de "Configurar > Geral".
     Plugin::registerClass(PluginApprovalbymailConfig::class, [

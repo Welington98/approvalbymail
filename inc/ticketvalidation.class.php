@@ -25,7 +25,13 @@ class PluginApprovalbymailTicketValidation extends CommonDBTM
         }
 
         // O destinatário da ação é o validador designado.
+        // GLPI 10: users_id_validate | GLPI 11: items_id_target + itemtype_target
         $users_id_validate = (int) ($item->fields['users_id_validate'] ?? 0);
+        if ($users_id_validate <= 0) {
+            $users_id_validate = (int) (($item->fields['itemtype_target'] ?? '') === User::class
+                ? ($item->fields['items_id_target'] ?? 0)
+                : 0);
+        }
         $validation_id     = (int) ($item->fields['id'] ?? 0);
         if ($users_id_validate <= 0 || $validation_id <= 0) {
             return;

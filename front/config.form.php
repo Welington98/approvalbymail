@@ -27,6 +27,18 @@ if (isset($_POST['update_config'])) {
         }
     }
 
+    // Salva URL da logo
+    if ($config->getFromDB(PluginApprovalbymailConfig::LOGO)) {
+        $new_logo = trim((string) ($_POST['logo_url'] ?? ''));
+        if ((string) ($config->fields['content'] ?? '') !== $new_logo) {
+            $config->update([
+                'id'          => PluginApprovalbymailConfig::LOGO,
+                'content'     => $new_logo,
+                'date_mod'    => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
+            ]);
+        }
+    }
+
     Session::addMessageAfterRedirect(__('Configuration updated', 'approvalbymail'), true, INFO);
 }
 

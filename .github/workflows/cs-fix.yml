@@ -1,0 +1,30 @@
+name: CS Fix
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cs-fix:
+    name: Verificar sintaxe PHP
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, json
+          coverage: none
+
+      - name: Verificar sintaxe PHP
+        run: |
+          find . -name "*.php" -not -path "./vendor/*" -print0 \
+            | xargs -0 -n1 -P4 php -l
