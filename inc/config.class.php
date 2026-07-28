@@ -12,7 +12,7 @@ class PluginApprovalbymailConfig extends CommonDBTM
     public const TICKET_VALIDATION = 1;
     public const TICKET_SOLUTION   = 2;
     public const FOLLOWUP_PRIVATE  = 3; // is_active=1 => acompanhamento de auditoria privado
-    // Fases seguintes: CHANGE_VALIDATION, etc.
+    public const LOGO             = 4; // URL da logo exibida na página de aprovação
 
     public $dohistory = false;
 
@@ -26,27 +26,27 @@ class PluginApprovalbymailConfig extends CommonDBTM
         return __('Approval by Mail', 'approvalbymail');
     }
 
-    static function canView()
+    static function canView(): bool
     {
         return Session::haveRight('config', READ);
     }
 
-    static function canCreate()
+    static function canCreate(): bool
     {
         return false;
     }
 
-    static function canUpdate()
+    static function canUpdate(): bool
     {
         return Session::haveRight('config', UPDATE);
     }
 
-    static function canDelete()
+    static function canDelete(): bool
     {
         return false;
     }
 
-    static function canPurge()
+    static function canPurge(): bool
     {
         return false;
     }
@@ -101,14 +101,32 @@ class PluginApprovalbymailConfig extends CommonDBTM
         echo '</tr>';
 
         foreach ($DB->request(['FROM' => self::getTable(), 'ORDER' => 'id']) as $row) {
+            $id = (int) $row['id'];
+            if ($id === self::LOGO) {
+                continue; // renderizado separadamente
+            }
             echo '<tr class="tab_bg_1">';
             echo '<td>' . htmlspecialchars((string) $row['name']) . '</td>';
             echo '<td>' . htmlspecialchars((string) ($row['content'] ?? '')) . '</td>';
             echo '<td>';
-            Dropdown::showYesNo('is_active_' . (int) $row['id'], (int) $row['is_active']);
+            Dropdown::showYesNo('is_active_' . $id, (int) $row['is_active']);
             echo '</td>';
             echo '</tr>';
         }
+
+        // --- Logo URL ---
+        $logo_row = current(iterator_to_array($DB->request([
+            'FROM' => self::getTable(),
+            'WHERE' => ['id' => self::LOGO]
+        ])));
+        $logo_url = $logo_row ? (string) ($logo_row['content'] ?? '') : '';
+        echo '<tr class="tab_bg_1">';
+        echo '<td>' . __('Logo URL', 'approvalbymail') . '</td>';
+        echo '<td colspan="2">';
+        echo '<input type="text" name="logo_url" value="' . htmlspecialchars($logo_url, ENT_QUOTES, 'UTF-8')
+            . '" style="width:100%" placeholder="https://example.com/logo.png">';
+        echo '</td>';
+        echo '</tr>';
 
         echo '<tr class="tab_bg_2"><td colspan="3" class="center">';
         echo Html::submit(_x('button', 'Save'), [

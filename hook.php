@@ -47,6 +47,13 @@ function plugin_approvalbymail_install(): bool
             'is_active' => 1,
             'date_mod'  => $now,
         ]);
+        $DB->insert($config_table, [
+            'id'        => PluginApprovalbymailConfig::LOGO,
+            'name'      => 'URL da Logo',
+            'content'   => '',
+            'is_active' => 1,
+            'date_mod'  => $now,
+        ]);
     }
 
     // --- Tabela de ações tokenizadas ---
@@ -67,6 +74,21 @@ function plugin_approvalbymail_install(): bool
                 KEY `token` (`token`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
+    }
+
+    // --- Garante linha da logo (migração) ---
+    $logo_exists = false;
+    foreach ($DB->request(['FROM' => $config_table, 'WHERE' => ['id' => PluginApprovalbymailConfig::LOGO]]) as $_row) {
+        $logo_exists = true;
+    }
+    if (!$logo_exists) {
+        $DB->insert($config_table, [
+            'id'        => PluginApprovalbymailConfig::LOGO,
+            'name'      => 'URL da Logo',
+            'content'   => '',
+            'is_active' => 1,
+            'date_mod'  => $now,
+        ]);
     }
 
     // --- Modelos de notificação (S2) ---

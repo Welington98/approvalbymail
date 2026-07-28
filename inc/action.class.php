@@ -24,27 +24,27 @@ class PluginApprovalbymailAction extends CommonDBTM
         return 'plugin_approvalbymail_actions_id';
     }
 
-    static function canView()
+    static function canView(): bool
     {
         return false;
     }
 
-    static function canCreate()
+    static function canCreate(): bool
     {
         return true;
     }
 
-    static function canUpdate()
+    static function canUpdate(): bool
     {
         return false;
     }
 
-    static function canDelete()
+    static function canDelete(): bool
     {
         return false;
     }
 
-    static function canPurge()
+    static function canPurge(): bool
     {
         return false;
     }

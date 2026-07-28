@@ -76,7 +76,7 @@ class PluginApprovalbymailNotificationTargetAction extends NotificationTarget
         $action = $this->obj; // PluginApprovalbymailAction
         $hash   = method_exists($action, 'getEncryptedHash') ? (string) $action->getEncryptedHash() : '';
         $base   = rtrim((string) ($CFG_GLPI['url_base'] ?? ''), '/');
-        $url    = $base . '/plugins/approvalbymail/front/action.php?hash=' . rawurlencode($hash);
+        $url    = $base . '/plugins/approvalbymail/front/approve.php?hash=' . rawurlencode($hash);
 
         // Resolve o chamado conforme o objeto da ação.
         $itemtype   = (string) ($action->fields['itemtype'] ?? '');
